@@ -10,9 +10,8 @@ public class HDFSUtil {
     private static Configuration conf = new Configuration();
 
     static {
-        conf.set("fs.hdfs.impl",org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
+        //conf.set("fs.hdfs.impl",org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
         conf.set("fs.defaultFS", "hdfs://localhost:8020");
-        System.setProperty("hadoop.home.dir", "/soft/hadoop");
     }
 
     /**
