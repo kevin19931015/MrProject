@@ -16,14 +16,15 @@ public class HDFSUtil {
 
     /**
      * @Title: isDirExists
-     * @param：@param filePath 文件（文件夹）路径
-     * @return：boolean 存在返回true，不存在返回false
-     * @Description：TODO 判断文件或文件夹是否存在
-     * @author Kevin
-     * @date 2018年7月05日 下午4:13:34
+     * @params：[filePath]
+     * @return：boolean
      * @throws
+     * @Description：
+     * @author Kevin
+     * @date 18-7-5
      */
     public static boolean isDirExists(String filePath) {
+
         FileSystem fs = null;
         try {
             fs = FileSystem.get(conf);
@@ -40,4 +41,6 @@ public class HDFSUtil {
         }
         return false;
     }
+
+
 }
