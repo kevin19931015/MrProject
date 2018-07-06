@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="hbase-mapreduce-2.0.0">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/hbase-mapreduce-2.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/hive-jdbc-3.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/hive-exec-3.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/hive-service-3.0.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
