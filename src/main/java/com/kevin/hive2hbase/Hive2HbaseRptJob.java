@@ -1,6 +1,7 @@
 package com.kevin.hive2hbase;
 
 import com.kevin.util.HDFSUtil;
+import com.kevin.util.HIVEUtil;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.HBaseConfiguration;
@@ -24,14 +25,9 @@ public class Hive2HbaseRptJob {
         String hivetablename = "rpt_job";
         String hbasetablename = "rpt_job";
         String hiveDbname = "jobs";
-        String date = ""; // 从控制台读入日期，格式为yyyymmdd
-        if (args.length == 0) {
-            System.out.println("input date empty!");
-            return;
-        }
-        date = "20180702";
+        String date = "20180702"; // 从控制台读入日期，格式为yyyymmdd
         // 判断Hive分区文件是否存在
-        String hivepath = "/user/hive/warehouse/jobs.db/" + hivetablename + "/pt=" + date;
+        String hivepath = "/hive/warehouse/jobs.db/" + hivetablename + "/pt=" + date;
         if (HDFSUtil.isDirExists(hivepath)) {
             Hive2HbaseRptJob.hive2Hbase(hiveDbname, hivetablename, hbasetablename, date);
             System.out.println("Insert finished!");
@@ -44,28 +40,17 @@ public class Hive2HbaseRptJob {
         Configuration conf = HBaseConfiguration.create();
         conf.set("dfs.permissions", "false");
         // 从本地加载
-        String hadoop_home = System.getenv("HADOOP_HOME");
-        String hhase_home = System.getenv("HBASE_HOME");
-        conf.addResource(new Path(hadoop_home + "/conf/mapred-site.xml"));
-        conf.addResource(new Path(hadoop_home + "/conf/core-site.xml"));
+        String hadoop_home = "/soft/hadoop";
+        String hhase_home = "/soft/hbase";
+        conf.addResource(new Path(hadoop_home + "/etc/hadoop/mapred-site.xml"));
+        conf.addResource(new Path(hadoop_home + "/etc/hadoop/core-site.xml"));
         conf.addResource(new Path(hhase_home + "/conf/hbase-site.xml"));
-        conf.addResource(new Path(hadoop_home + "/conf/yarn-site.xml"));
+        conf.addResource(new Path(hadoop_home + "/etc/hadoop/yarn-site.xml"));
 
         conf.set("hbasetable", hbaseTableName);
         conf.set("job_date", dayPartition);
         // 把Hive中的所有列都导入HBase表
-        String hivetablecolumnlist = "";
-        // 把所有列表存储在字符串中，以逗号分隔
-        //List<String> colNameLst = HiveJdbcUtil.getTableColumn(PropertiesUtil.getPropertyValue("hive.jdbcurl"), hiveDbName + "." + hiveTableName);
-        List<String> colNameLst = null;
-        // 获取列名
-        for (int i = 0; i < colNameLst.size(); i++) {
-            if (i == colNameLst.size() - 1) {
-                hivetablecolumnlist = hivetablecolumnlist + colNameLst.get(i);
-            } else {
-                hivetablecolumnlist = hivetablecolumnlist + colNameLst.get(i) + ",";
-            }
-        }
+        String hivetablecolumnlist = HIVEUtil.getTableColumn(hiveTableName);
         conf.set("hivetablecolumnlist", hivetablecolumnlist);
         Job job = Job.getInstance(conf, "Hive2Hbase rpt_job ");
         job.setJarByClass(Hive2HbaseRptJob.class);
@@ -73,7 +58,7 @@ public class Hive2HbaseRptJob {
         job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(Text.class);
         job.setInputFormatClass(SequenceFileAsTextInputFormat.class);
-        Path in = new Path("/user/hive/warehouse/jobs.db/" + hiveTableName + "/pt=" + dayPartition);
+        Path in = new Path("/hive/warehouse/jobs.db/" + hiveTableName + "/pt=" + dayPartition);
         SequenceFileAsTextInputFormat.addInputPath(job, in);
         job.setReducerClass(ReduceToHbase.class);
         TableMapReduceUtil.initTableReducerJob(hbaseTableName, ReduceToHbase.class, job);
